@@ -8,11 +8,10 @@ import os
 import openpyxl as px
 import numpy as np
 import pprint
+
 def readPrice(pathToDB):
-
-
     W = px.load_workbook(pathToDB)
-    p = W.get_sheet_by_name(name='Sheet1')
+    p = W['Sheet1']
 
     a = []
 
@@ -22,20 +21,37 @@ def readPrice(pathToDB):
             if k.internal_value != None:
                 val = k.internal_value
                 if type(val) == unicode:
-                    #val = val.encode('cp1251')
-                    print val.encode('utf-8')
+                    val = val.encode('utf-8')
+                    val = val.lower()
                 b.append(val)
         if b != []:
             a.append(b)
-    print "\n".join([str(i) for i in a])
 
+    return a
+
+def checkAvailability(listPosition, reqCom):
+    for xlStr in listPosition:
+        if reqCom.decode("utf-8").lower() == xlStr[0].decode("utf-8").lower():
+            print xlStr[0], xlStr[1], "рублей"
+            return
+    print "Comics \'{0}\' not found".format(reqCom)
     return
 
 
+def readAndCheckAvailability(listPosition):
+    while True:
+        print "Write comics name"
+        reqCom = raw_input()
+        if reqCom == "":
+            break
+        checkAvailability(listPosition, reqCom)
+    return
+
 def main():
-    print "Done!"
     myPath = os.getcwd()
-    readPrice(myPath + "/try_1.xlsx")
+    listPosition = readPrice(myPath + "/try_1.xlsx")
+    readAndCheckAvailability(listPosition)
+    print "Done"
     return
 
 if __name__ == "__main__":
